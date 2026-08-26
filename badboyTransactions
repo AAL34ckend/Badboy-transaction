@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Laporan Harian Barbershop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#17161a;
+    --panel:#211f24;
+    --panel-2:#2a272e;
+    --line: rgba(242,237,228,0.09);
+    --cream:#f2ede4;
+    --muted:#948d80;
+    --red:#c0453a;
+    --red-dim: rgba(192,69,58,0.16);
+    --blue:#3f6d95;
+    --blue-dim: rgba(63,109,149,0.16);
+    --green:#5a9364;
+    --paper:#f4efe2;
+    --paper-ink:#2a241c;
+    --radius: 14px;
+    --display: 'Oswald', sans-serif;
+    --body: 'Inter', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(circle at 20% -10%, #201d24 0%, var(--bg) 45%) fixed;
+    color: var(--cream);
+    font-family: var(--body);
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 60px;
+  }
+  .wrap{ max-width: 640px; margin: 0 auto; padding: 18px 14px 40px; }
+
+  /* HEADER */
+  .topbar{
+    display:flex; align-items:center; gap:12px; padding: 6px 2px 18px;
+  }
+  .pole{
+    width: 10px; height: 40px; border-radius: 6px; flex-shrink:0;
+    background: repeating-linear-gradient(45deg, var(--red) 0 8px, var(--blue) 8px 16px, var(--cream) 16px 20px);
+    box-shadow: 0 0 0 2px #0e0d10 inset;
+  }
+  .brand h1{
+    font-family: var(--display); font-size: 20px; letter-spacing:0.04em;
+    margin:0; text-transform: uppercase; color: var(--cream);
+  }
+  .brand p{ margin:2px 0 0; font-size: 12px; color: var(--muted); }
+
+  /* CARD */
+  .card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-head{
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;
+  }
+  .card-title{
+    font-family: var(--display); font-size: 13px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted); margin:0;
+  }
+  .card-title.accent{ color: var(--red); }
+
+  /* FIELD ROW */
+  .field-row{ display:flex; gap:10px; margin-bottom:10px; }
+  .field-row:last-child{ margin-bottom:0; }
+  .field{ flex:1; min-width:0; }
+  label.small-label{
+    display:block; font-size: 11px; color: var(--muted); margin-bottom: 5px; letter-spacing:0.03em;
+  }
+  select, input[type=date], input[type=number], input[type=text]{
+    width:100%; background: var(--panel-2); color: var(--cream);
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 11px; font-size: 14px; font-family: var(--body);
+    -webkit-appearance:none; appearance:none;
+  }
+  select:focus, input:focus{ outline: 2px solid var(--red); outline-offset: 1px; }
+  .select-with-actions{ display:flex; gap:6px; align-items:stretch; }
+  .select-with-actions select{ flex:1; }
+
+  .icon-btn{
+    width:38px; height:38px; flex-shrink:0; border-radius:10px; border:1px solid var(--line);
+    background: var(--panel-2); color: var(--cream); font-size:16px; line-height:1;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition: background .15s ease, transform .08s ease;
+  }
+  .icon-btn:active{ transform: scale(0.93); }
+  .icon-btn.plus{ color: var(--green); }
+  .icon-btn.pen{ color: var(--blue); }
+  .icon-btn.x{ color: var(--red); }
+  .icon-btn:hover{ background:#332f37; }
+
+  /* ITEM LIST (pendapatan/produk) */
+  .item-row{
+    display:flex; align-items:center; gap:10px; padding: 9px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .item-row:last-of-type{ border-bottom:none; }
+  .item-info{ flex:1; min-width:0; }
+  .item-name{ font-size: 14px; color: var(--cream); }
+  .item-price{ font-size: 12px; color: var(--muted); font-family: var(--mono); }
+  .stepper{ display:flex; align-items:center; gap:6px; flex-shrink:0; }
+  .step-btn{
+    width:30px; height:30px; border-radius: 8px; border:1px solid var(--line);
+    background: var(--panel-2); color: var(--cream); font-size:16px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none;
+  }
+  .step-btn:active{ background: var(--red-dim); }
+  .qty-input{
+    width: 42px; text-align:center; padding: 6px 2px; font-family: var(--mono); font-size:14px;
+  }
+  .item-actions{ display:flex; gap:4px; flex-shrink:0; }
+  .item-actions .icon-btn{ width:28px; height:28px; font-size:12px; }
+
+  .add-item-btn{
+    width:100%; margin-top:10px; padding:10px; border-radius:10px; border:1px dashed var(--line);
+    background:transparent; color: var(--muted); font-size:13px; cursor:pointer;
+  }
+  .add-item-btn:hover{ color: var(--cream); border-color: var(--muted); }
+
+  /* PENGELUARAN */
+  .expense-fixed .field-row{ align-items:flex-end; }
+  .custom-expense-row{
+    display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px dashed var(--line);
+  }
+  .custom-expense-row:last-of-type{ border-bottom:none; }
+  .custom-expense-name{ flex:1; font-size:14px; }
+  .custom-expense-value{ font-family: var(--mono); font-size:13px; color: var(--muted); width:90px; text-align:right; }
+
+  /* TOTALS */
+  .totals{ display:flex; gap:12px; }
+  .total-box{
+    flex:1; border-radius: 12px; padding: 14px; text-align:center;
+    border: 1px solid var(--line);
+  }
+  .total-box.awal{ background: var(--blue-dim); }
+  .total-box.akhir{ background: var(--red-dim); }
+  .total-label{ font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color: var(--muted); margin-bottom:6px; }
+  .total-value{ font-family: var(--mono); font-size: 19px; font-weight:700; color: var(--cream); }
+
+  /* ACTION BUTTONS */
+  .action-row{ display:flex; gap:10px; margin-top:16px; }
+  .btn{
+    flex:1; padding: 13px; border-radius: 12px; border:none; font-family: var(--display);
+    font-size: 14px; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer;
+  }
+  .btn-primary{ background: var(--red); color: #fff; }
+  .btn-secondary{ background: var(--panel-2); color: var(--cream); border: 1px solid var(--line); }
+  .btn:active{ transform: scale(0.98); }
+
+  .toast{
+    position: fixed; left:50%; bottom: 22px; transform: translateX(-50%) translateY(20px);
+    background: var(--cream); color:#1a1a1a; padding: 10px 18px; border-radius: 999px;
+    font-size:13px; opacity:0; pointer-events:none; transition: all .25s ease; z-index: 999;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  }
+  .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+
+  /* MODAL */
+  .modal-overlay{
+    position: fixed; inset:0; background: rgba(0,0,0,0.55); display:none;
+    align-items:flex-end; justify-content:center; z-index: 1000; padding: 0;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal-box{
+    background: var(--panel); width:100%; max-width: 640px; border-radius: 18px 18px 0 0;
+    padding: 20px 18px 26px; border: 1px solid var(--line); border-bottom:none;
+    animation: slideUp .2s ease;
+  }
+  @keyframes slideUp{ from{ transform: translateY(30px); opacity:0;} to{ transform: translateY(0); opacity:1;} }
+  .modal-title{ font-family: var(--display); font-size:16px; text-transform:uppercase; letter-spacing:0.06em; margin: 0 0 14px; }
+  .modal-actions{ display:flex; gap:10px; margin-top: 16px; }
+
+  /* REPORT (receipt style) */
+  #reportOverlay .modal-box{ max-height: 88vh; overflow-y:auto; border-radius:18px; margin: 0 12px 0; }
+  .receipt{
+    background: var(--paper); color: var(--paper-ink); font-family: var(--mono);
+    font-size: 13px; line-height: 1.65; padding: 22px 18px 26px; border-radius: 6px;
+    white-space: pre-wrap; word-break: break-word;
+    background-image: linear-gradient(180deg, transparent 0, transparent calc(100% - 14px));
+    position: relative;
+  }
+  .receipt::after{
+    content:""; display:block; position:absolute; left:0; right:0; bottom:-1px; height:14px;
+    background: repeating-linear-gradient(-45deg, var(--paper) 0 7px, transparent 7px 14px);
+  }
+  .receipt-title{ text-align:center; font-family: var(--display); letter-spacing:0.15em; font-size:15px; margin-bottom:8px; }
+  .receipt hr{ border:none; border-top: 1px dashed rgba(42,36,28,0.35); margin: 8px 0; }
+
+  .muted-note{ font-size:12px; color: var(--muted); margin-top:4px; }
+
+  ::selection{ background: var(--red); color:#fff; }
+
+  @media (max-width: 380px){
+    .totals{ flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="pole"></div>
+    <div class="brand">
+      <h1>Laporan Harian</h1>
+      <p>Catat transaksi, generate laporan tutup kasir</p>
+    </div>
+  </div>
+
+  <!-- TANGGAL & KAPSTER -->
+  <div class="card">
+    <div class="field-row">
+      <div class="field">
+        <label class="small-label">Tanggal</label>
+        <input type="date" id="tanggalInput">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label class="small-label">Kapster</label>
+        <div class="select-with-actions">
+          <select id="kapsterSelect"></select>
+          <button class="icon-btn plus" data-action="add-kapster" title="Tambah kapster">+</button>
+          <button class="icon-btn x" data-action="del-kapster" title="Hapus kapster">✕</button>
+        </div>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label class="small-label">Tempat</label>
+        <div class="select-with-actions">
+          <select id="tempatSelect"></select>
+          <button class="icon-btn plus" data-action="add-tempat" title="Tambah tempat">+</button>
+          <button class="icon-btn pen" data-action="edit-tempat" title="Edit tempat">✎</button>
+          <button class="icon-btn x" data-action="del-tempat" title="Hapus tempat">✕</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PENDAPATAN -->
+  <div class="card">
+    <div class="card-head">
+      <p class="card-title accent">Pendapatan</p>
+    </div>
+    <div id="pendapatanList"></div>
+    <button class="add-item-btn" data-action="add-pendapatan">+ Tambah item pendapatan</button>
+  </div>
+
+  <!-- PRODUK -->
+  <div class="card">
+    <div class="card-head">
+      <p class="card-title accent">Produk</p>
+    </div>
+    <div id="produkList"></div>
+    <button class="add-item-btn" data-action="add-produk">+ Tambah item produk</button>
+  </div>
+
+  <!-- TOTAL AWAL -->
+  <div class="totals">
+    <div class="total-box awal">
+      <div class="total-label">Total Awal</div>
+      <div class="total-value" id="totalAwalView">Rp 0</div>
+    </div>
+  </div>
+
+  <!-- PENGELUARAN -->
+  <div class="card" style="margin-top:14px;">
+    <div class="card-head">
+      <p class="card-title">Pengeluaran</p>
+    </div>
+    <div class="expense-fixed">
+      <div class="field-row">
+        <div class="field">
+          <label class="small-label">QRIS</label>
+          <input type="number" inputmode="numeric" id="qrisInput" placeholder="0">
+        </div>
+        <div class="field">
+          <label class="small-label">UM (uang makan)</label>
+          <input type="number" inputmode="numeric" id="umInput" placeholder="0">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="small-label">Free Haircut (nilai Rp)</label>
+          <input type="number" inputmode="numeric" id="freeHaircutInput" placeholder="0">
+        </div>
+      </div>
+    </div>
+    <hr style="border:none;border-top:1px dashed var(--line);margin:14px 0;">
+    <div id="customExpenseList"></div>
+    <button class="add-item-btn" data-action="add-expense">+ Tambah pengeluaran lain</button>
+  </div>
+
+  <!-- TOTAL AKHIR -->
+  <div class="totals">
+    <div class="total-box akhir">
+      <div class="total-label">Total Akhir (Tunai)</div>
+      <div class="total-value" id="totalAkhirView">Rp 0</div>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn btn-secondary" data-action="reset-day">Reset Hari Ini</button>
+    <button class="btn btn-primary" data-action="generate">Generate Laporan</button>
+  </div>
+  <p class="muted-note" id="autosaveNote">Data tersimpan otomatis di browser ini.</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- GENERIC MODAL -->
+<div class="modal-overlay" id="genericOverlay">
+  <div class="modal-box">
+    <p class="modal-title" id="genericTitle">Judul</p>
+    <div id="genericFields"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" data-action="modal-cancel">Batal</button>
+      <button class="btn btn-primary" data-action="modal-confirm">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- REPORT MODAL -->
+<div class="modal-overlay" id="reportOverlay">
+  <div class="modal-box">
+    <p class="modal-title">Laporan</p>
+    <div class="receipt" id="receiptText"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" data-action="close-report">Tutup</button>
+      <button class="btn btn-primary" data-action="copy-report">Salin Teks</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var MASTER_KEY = "bs_master_v1";
+  var HISTORY_KEY = "bs_history_v1";
+  var MAX_KAPSTER = 6;
+
+  /* ---------- helpers ---------- */
+  function uid(){ return Math.random().toString(36).slice(2,9); }
+  function todayISO(){
+    var d = new Date();
+    var m = String(d.getMonth()+1).padStart(2,"0");
+    var day = String(d.getDate()).padStart(2,"0");
+    return d.getFullYear()+"-"+m+"-"+day;
+  }
+  function isoToDisplay(iso){
+    var p = iso.split("-");
+    return p[2]+"/"+p[1]+"/"+p[0];
+  }
+  function formatRupiah(n){
+    n = Math.round(Number(n)||0);
+    var neg = n < 0;
+    n = Math.abs(n);
+    var s = n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return (neg?"-":"")+s;
+  }
+  function toast(msg){
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toast._h);
+    toast._h = setTimeout(function(){ t.classList.remove("show"); }, 1800);
+  }
+
+  /* ---------- master data (kapster, tempat, item templates) ---------- */
+  function defaultMaster(){
+    return {
+      kapsters: ["ALMANSHURAH"],
+      tempats: [ { id: uid(), name: "Badboy Barber MANISRENGGO" } ],
+      pendapatanItems: [
+        { id: uid(), name: "Haircut", price: 20000 },
+        { id: uid(), name: "Haircut", price: 25000 },
+        { id: uid(), name: "Vitamin", price: 5000 },
+        { id: uid(), name: "Smoothing", price: 60000 },
+        { id: uid(), name: "Semir Hitam", price: 50000 },
+        { id: uid(), name: "Semir Bleaching", price: 60000 },
+        { id: uid(), name: "Semir Warna", price: 60000 },
+        { id: uid(), name: "Semir Hairlight", price: 160000 },
+        { id: uid(), name: "Hairmask", price: 25000 },
+        { id: uid(), name: "Shaving", price: 5000 }
+      ],
+      produkItems: [
+        { id: uid(), name: "Pomade", price: 30000 },
+        { id: uid(), name: "Tonic", price: 30000 },
+        { id: uid(), name: "Kemiri", price: 25000 },
+        { id: uid(), name: "Hairpowder", price: 25000 },
+        { id: uid(), name: "Conditioner", price: 15000 }
+      ]
+    };
+  }
+  function loadMaster(){
+    try{
+      var raw = localStorage.getItem(MASTER_KEY);
+      if(!raw) return defaultMaster();
+      var m = JSON.parse(raw);
+      if(!m.kapsters || !m.tempats || !m.pendapatanItems || !m.produkItems) return defaultMaster();
+      return m;
+    }catch(e){ return defaultMaster(); }
+  }
+  function saveMaster(){ localStorage.setItem(MASTER_KEY, JSON.stringify(master)); }
+
+  function loadHistory(){
+    try{ return JSON.parse(localStorage.getItem(HISTORY_KEY) || "{}"); }
+    catch(e){ return {}; }
+  }
+  function saveHistory(){ localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }
+
+  function itemLabel(item){
+    var k = item.price % 1000 === 0 ? (item.price/1000)+"K" : formatRupiah(item.price);
+    return item.name + " " + k;
+  }
+
+  /* ---------- day record ---------- */
+  function blankDay(iso){
+    return {
+      tanggal: iso,
+      kapster: master.kapsters[0] || "",
+      tempatId: (master.tempats[0] && master.tempats[0].id) || "",
+      pendapatan: {},
+      produk: {},
+      pengeluaran: { qris: 0, um: 0, freeHaircut: 0, custom: [] }
+    };
+  }
+  function ensureDayShape(day){
+    day.pendapatan = day.pendapatan || {};
+    day.produk = day.produk || {};
+    day.pengeluaran = day.pengeluaran || { qris:0, um:0, freeHaircut:0, custom:[] };
+    day.pengeluaran.custom = day.pengeluaran.custom || [];
+    return day;
+  }
+
+  var master = loadMaster();
+  var history = loadHistory();
+  var currentISO = todayISO();
+  var day = history[currentISO] ? ensureDayShape(history[currentISO]) : blankDay(currentISO);
+
+  function persistDay(){
+    history[currentISO] = day;
+    saveHistory();
+  }
+
+  /* ---------- rendering ---------- */
+  var el = {
+    tanggal: document.getElementById("tanggalInput"),
+    kapster: document.getElementById("kapsterSelect"),
+    tempat: document.getElementById("tempatSelect"),
+    pendapatanList: document.getElementById("pendapatanList"),
+    produkList: document.getElementById("produkList"),
+    customExpenseList: document.getElementById("customExpenseList"),
+    qris: document.getElementById("qrisInput"),
+    um: document.getElementById("umInput"),
+    freeHaircut: document.getElementById("freeHaircutInput"),
+    totalAwal: document.getElementById("totalAwalView"),
+    totalAkhir: document.getElementById("totalAkhirView")
+  };
+
+  function renderKapsterSelect(){
+    el.kapster.innerHTML = "";
+    master.kapsters.forEach(function(name){
+      var o = document.createElement("option");
+      o.value = name; o.textContent = name;
+      if(name === day.kapster) o.selected = true;
+      el.kapster.appendChild(o);
+    });
+    if(!master.kapsters.includes(day.kapster)){
+      day.kapster = master.kapsters[0] || "";
+      el.kapster.value = day.kapster;
+    }
+  }
+
+  function renderTempatSelect(){
+    el.tempat.innerHTML = "";
+    master.tempats.forEach(function(t){
+      var o = document.createElement("option");
+      o.value = t.id; o.textContent = t.name;
+      if(t.id === day.tempatId) o.selected = true;
+      el.tempat.appendChild(o);
+    });
+    if(!master.tempats.find(function(t){return t.id===day.tempatId;})){
+      day.tempatId = (master.tempats[0] && master.tempats[0].id) || "";
+      el.tempat.value = day.tempatId;
+    }
+  }
+
+  function makeItemRow(item, qtyMap, kind){
+    var row = document.createElement("div");
+    row.className = "item-row";
+    var qty = qtyMap[item.id] || 0;
+
+    var info = document.createElement("div");
+    info.className = "item-info";
+    info.innerHTML = '<div class="item-name">'+item.name+'</div><div class="item-price">Rp '+formatRupiah(item.price)+'</div>';
+
+    var stepper = document.createElement("div");
+    stepper.className = "stepper";
+    var minus = document.createElement("button");
+    minus.className = "step-btn"; minus.textContent = "–";
+    var input = document.createElement("input");
+    input.type = "number"; input.className = "qty-input"; input.value = qty; input.min = "0";
+    var plus = document.createElement("button");
+    plus.className = "step-btn"; plus.textContent = "+";
+
+    minus.addEventListener("click", function(){
+      qtyMap[item.id] = Math.max(0, (qtyMap[item.id]||0) - 1);
+      input.value = qtyMap[item.id];
+      afterChange();
+    });
+    plus.addEventListener("click", function(){
+      qtyMap[item.id] = (qtyMap[item.id]||0) + 1;
+      input.value = qtyMap[item.id];
+      afterChange();
+    });
+    input.addEventListener("input", function(){
+      var v = parseInt(input.value,10);
+      qtyMap[item.id] = isNaN(v) || v < 0 ? 0 : v;
+      afterChange();
+    });
+
+    stepper.appendChild(minus); stepper.appendChild(input); stepper.appendChild(plus);
+
+    var actions = document.createElement("div");
+    actions.className = "item-actions";
+    var pen = document.createElement("button");
+    pen.className = "icon-btn pen"; pen.textContent = "✎"; pen.title = "Edit item";
+    pen.addEventListener("click", function(){ editTemplateItem(kind, item.id); });
+    var x = document.createElement("button");
+    x.className = "icon-btn x"; x.textContent = "✕"; x.title = "Hapus item";
+    x.addEventListener("click", function(){ deleteTemplateItem(kind, item.id); });
+    actions.appendChild(pen); actions.appendChild(x);
+
+    row.appendChild(info); row.appendChild(stepper); row.appendChild(actions);
+    return row;
+  }
+
+  function renderPendapatan(){
+    el.pendapatanList.innerHTML = "";
+    master.pendapatanItems.forEach(function(item){
+      el.pendapatanList.appendChild(makeItemRow(item, day.pendapatan, "pendapatan"));
+    });
+  }
+  function renderProduk(){
+    el.produkList.innerHTML = "";
+    master.produkItems.forEach(function(item){
+      el.produkList.appendChild(makeItemRow(item, day.produk, "produk"));
+    });
+  }
+
+  function renderCustomExpense(){
+    el.customExpenseList.innerHTML = "";
+    day.pengeluaran.custom.forEach(function(c){
+      var row = document.createElement("div");
+      row.className = "custom-expense-row";
+      var name = document.createElement("div");
+      name.className = "custom-expense-name"; name.textContent = c.name;
+      var valInput = document.createElement("input");
+      valInput.type = "number"; valInput.className = "custom-expense-value"; valInput.value = c.value;
+      valInput.addEventListener("input", function(){
+        c.value = parseInt(valInput.value,10) || 0;
+        afterChange();
+      });
+      var pen = document.createElement("button");
+      pen.className = "icon-btn pen"; pen.textContent = "✎"; pen.style.width="30px"; pen.style.height="30px";
+      pen.addEventListener("click", function(){ renameCustomExpense(c.id); });
+      var x = document.createElement("button");
+      x.className = "icon-btn x"; x.textContent = "✕"; x.style.width="30px"; x.style.height="30px";
+      x.addEventListener("click", function(){
+        day.pengeluaran.custom = day.pengeluaran.custom.filter(function(e){return e.id!==c.id;});
+        renderCustomExpense(); afterChange();
+      });
+      row.appendChild(name); row.appendChild(valInput); row.appendChild(pen); row.appendChild(x);
+      el.customExpenseList.appendChild(row);
+    });
+  }
+
+  function computeTotals(){
+    var totalAwal = 0;
+    master.pendapatanItems.forEach(function(item){
+      totalAwal += (day.pendapatan[item.id]||0) * item.price;
+    });
+    master.produkItems.forEach(function(item){
+      totalAwal += (day.produk[item.id]||0) * item.price;
+    });
+    var pengeluaranSum = (day.pengeluaran.qris||0) + (day.pengeluaran.um||0) + (day.pengeluaran.freeHaircut||0);
+    day.pengeluaran.custom.forEach(function(c){ pengeluaranSum += (c.value||0); });
+    var totalAkhir = totalAwal - pengeluaranSum;
+    return { totalAwal: totalAwal, totalAkhir: totalAkhir };
+  }
+
+  function renderTotals(){
+    var t = computeTotals();
+    el.totalAwal.textContent = "Rp " + formatRupiah(t.totalAwal);
+    el.totalAkhir.textContent = "Rp " + formatRupiah(t.totalAkhir);
+  }
+
+  function renderAll(){
+    el.tanggal.value = currentISO;
+    renderKapsterSelect();
+    renderTempatSelect();
+    renderPendapatan();
+    renderProduk();
+    el.qris.value = day.pengeluaran.qris || 0;
+    el.um.value = day.pengeluaran.um || 0;
+    el.freeHaircut.value = day.pengeluaran.freeHaircut || 0;
+    renderCustomExpense();
+    renderTotals();
+  }
+
+  function afterChange(){
+    renderTotals();
+    persistDay();
+  }
+
+  /* ---------- fixed field listeners ---------- */
+  el.tanggal.addEventListener("change", function(){
+    currentISO = el.tanggal.value || todayISO();
+    day = history[currentISO] ? ensureDayShape(history[currentISO]) : blankDay(currentISO);
+    renderAll();
+  });
+  el.kapster.addEventListener("change", function(){
+    day.kapster = el.kapster.value; afterChange();
+  });
+  el.tempat.addEventListener("change", function(){
+    day.tempatId = el.tempat.value; afterChange();
+  });
+  el.qris.addEventListener("input", function(){
+    day.pengeluaran.qris = parseInt(el.qris.value,10) || 0; afterChange();
+  });
+  el.um.addEventListener("input", function(){
+    day.pengeluaran.um = parseInt(el.um.value,10) || 0; afterChange();
+  });
+  el.freeHaircut.addEventListener("input", function(){
+    day.pengeluaran.freeHaircut = parseInt(el.freeHaircut.value,10) || 0; afterChange();
+  });
+
+  /* ---------- generic modal ---------- */
+  var genericOverlay = document.getElementById("genericOverlay");
+  var genericFields = document.getElementById("genericFields");
+  var genericTitle = document.getElementById("genericTitle");
+  var modalResolve = null;
+
+  function openModal(title, fields){
+    genericTitle.textContent = title;
+    genericFields.innerHTML = "";
+    fields.forEach(function(f){
+      var wrap = document.createElement("div");
+      wrap.className = "field-row";
+      var inner = document.createElement("div");
+      inner.className = "field";
+      var lbl = document.createElement("label");
+      lbl.className = "small-label"; lbl.textContent = f.label;
+      var inp = document.createElement("input");
+      inp.type = f.type || "text";
+      inp.id = "mf_"+f.key;
+      inp.value = f.value !== undefined ? f.value : "";
+      if(f.placeholder) inp.placeholder = f.placeholder;
+      inner.appendChild(lbl); inner.appendChild(inp);
+      wrap.appendChild(inner);
+      genericFields.appendChild(wrap);
+    });
+    genericOverlay.classList.add("show");
+    return new Promise(function(resolve){ modalResolve = resolve; });
+  }
+  function closeModal(result){
+    genericOverlay.classList.remove("show");
+    if(modalResolve) modalResolve(result);
+    modalResolve = null;
+  }
+  document.querySelector('[data-action="modal-cancel"]').addEventListener("click", function(){ closeModal(null); });
+  document.querySelector('[data-action="modal-confirm"]').addEventListener("click", function(){
+    var inputs = genericFields.querySelectorAll("input");
+    var result = {};
+    inputs.forEach(function(inp){ result[inp.id.replace("mf_","")] = inp.value; });
+    closeModal(result);
+  });
+
+  /* ---------- kapster management ---------- */
+  document.querySelector('[data-action="add-kapster"]').addEventListener("click", async function(){
+    if(master.kapsters.length >= MAX_KAPSTER){ toast("Maksimal "+MAX_KAPSTER+" kapster"); return; }
+    var r = await openModal("Tambah Kapster", [{key:"name", label:"Nama kapster", placeholder:"Nama"}]);
+    if(!r || !r.name.trim()) return;
+    master.kapsters.push(r.name.trim().toUpperCase());
+    saveMaster(); renderKapsterSelect();
+    day.kapster = r.name.trim().toUpperCase();
+    afterChange();
+    toast("Kapster ditambahkan");
+  });
+  document.querySelector('[data-action="del-kapster"]').addEventListener("click", function(){
+    if(master.kapsters.length <= 1){ toast("Minimal 1 kapster"); return; }
+    var name = el.kapster.value;
+    if(!confirm('Hapus kapster "'+name+'"?')) return;
+    master.kapsters = master.kapsters.filter(function(n){ return n !== name; });
+    saveMaster(); renderKapsterSelect(); afterChange();
+    toast("Kapster dihapus");
+  });
+
+  /* ---------- tempat management ---------- */
+  document.querySelector('[data-action="add-tempat"]').addEventListener("click", async function(){
+    var r = await openModal("Tambah Tempat", [{key:"name", label:"Nama tempat", placeholder:"Nama Barbershop"}]);
+    if(!r || !r.name.trim()) return;
+    var t = { id: uid(), name: r.name.trim() };
+    master.tempats.push(t);
+    saveMaster(); renderTempatSelect();
+    day.tempatId = t.id;
+    afterChange();
+    toast("Tempat ditambahkan");
+  });
+  document.querySelector('[data-action="edit-tempat"]').addEventListener("click", async function(){
+    var t = master.tempats.find(function(x){return x.id===el.tempat.value;});
+    if(!t) return;
+    var r = await openModal("Edit Tempat", [{key:"name", label:"Nama tempat", value:t.name}]);
+    if(!r || !r.name.trim()) return;
+    t.name = r.name.trim();
+    saveMaster(); renderTempatSelect();
+    toast("Tempat diperbarui");
+  });
+  document.querySelector('[data-action="del-tempat"]').addEventListener("click", function(){
+    if(master.tempats.length <= 1){ toast("Minimal 1 tempat"); return; }
+    var t = master.tempats.find(function(x){return x.id===el.tempat.value;});
+    if(!t) return;
+    if(!confirm('Hapus tempat "'+t.name+'"?')) return;
+    master.tempats = master.tempats.filter(function(x){return x.id!==t.id;});
+    saveMaster(); renderTempatSelect(); afterChange();
+    toast("Tempat dihapus");
+  });
+
+  /* ---------- pendapatan / produk item template management ---------- */
+  function getItemList(kind){ return kind === "pendapatan" ? master.pendapatanItems : master.produkItems; }
+
+  document.querySelector('[data-action="add-pendapatan"]').addEventListener("click", function(){ addTemplateItem("pendapatan"); });
+  document.querySelector('[data-action="add-produk"]').addEventListener("click", function(){ addTemplateItem("produk"); });
+
+  async function addTemplateItem(kind){
+    var r = await openModal("Tambah Item", [
+      {key:"name", label:"Nama item", placeholder:"cth: Semir Fantasy"},
+      {key:"price", label:"Harga (Rp)", type:"number", placeholder:"cth: 60000"}
+    ]);
+    if(!r || !r.name.trim()) return;
+    var price = parseInt(r.price,10) || 0;
+    getItemList(kind).push({ id: uid(), name: r.name.trim(), price: price });
+    saveMaster();
+    if(kind==="pendapatan") renderPendapatan(); else renderProduk();
+    toast("Item ditambahkan");
+  }
+
+  async function editTemplateItem(kind, itemId){
+    var list = getItemList(kind);
+    var item = list.find(function(i){return i.id===itemId;});
+    if(!item) return;
+    var r = await openModal("Edit Item", [
+      {key:"name", label:"Nama item", value:item.name},
+      {key:"price", label:"Harga (Rp)", type:"number", value:item.price}
+    ]);
+    if(!r || !r.name.trim()) return;
+    item.name = r.name.trim();
+    item.price = parseInt(r.price,10) || 0;
+    saveMaster();
+    if(kind==="pendapatan") renderPendapatan(); else renderProduk();
+    afterChange();
+    toast("Item diperbarui");
+  }
+
+  function deleteTemplateItem(kind, itemId){
+    var list = getItemList(kind);
+    var item = list.find(function(i){return i.id===itemId;});
+    if(!item) return;
+    if(!confirm('Hapus item "'+item.name+'"?')) return;
+    if(kind==="pendapatan"){
+      master.pendapatanItems = master.pendapatanItems.filter(function(i){return i.id!==itemId;});
+      delete day.pendapatan[itemId];
+      renderPendapatan();
+    } else {
+      master.produkItems = master.produkItems.filter(function(i){return i.id!==itemId;});
+      delete day.produk[itemId];
+      renderProduk();
+    }
+    saveMaster(); afterChange();
+    toast("Item dihapus");
+  }
+
+  /* ---------- custom pengeluaran ---------- */
+  document.querySelector('[data-action="add-expense"]').addEventListener("click", async function(){
+    var r = await openModal("Tambah Pengeluaran", [
+      {key:"name", label:"Nama pengeluaran", placeholder:"cth: Listrik 1 Bulan"},
+      {key:"value", label:"Jumlah (Rp)", type:"number", placeholder:"cth: 144000"}
+    ]);
+    if(!r || !r.name.trim()) return;
+    day.pengeluaran.custom.push({ id: uid(), name: r.name.trim(), value: parseInt(r.value,10)||0 });
+    renderCustomExpense(); afterChange();
+    toast("Pengeluaran ditambahkan");
+  });
+  async function renameCustomExpense(cid){
+    var c = day.pengeluaran.custom.find(function(x){return x.id===cid;});
+    if(!c) return;
+    var r = await openModal("Edit Pengeluaran", [{key:"name", label:"Nama pengeluaran", value:c.name}]);
+    if(!r || !r.name.trim()) return;
+    c.name = r.name.trim();
+    renderCustomExpense(); afterChange();
+  }
+
+  /* ---------- reset / generate ---------- */
+  document.querySelector('[data-action="reset-day"]').addEventListener("click", function(){
+    if(!confirm("Reset semua input untuk tanggal ini?")) return;
+    day = blankDay(currentISO);
+    renderAll(); persistDay();
+    toast("Laporan hari ini direset");
+  });
+
+  function generateReportText(){
+    var t = computeTotals();
+    var tempat = master.tempats.find(function(x){return x.id===day.tempatId;});
+    var lines = [];
+    lines.push("LAPORAN HARIAN");
+    lines.push("Tanggal " + isoToDisplay(day.tanggal));
+    lines.push("Kapster : " + day.kapster);
+    lines.push("PENDAPATAN");
+    lines.push(tempat ? tempat.name : "-");
+    master.pendapatanItems.forEach(function(item){
+      lines.push("•" + itemLabel(item) + " : " + (day.pendapatan[item.id]||0));
+    });
+    lines.push("PRODUK");
+    master.produkItems.forEach(function(item){
+      lines.push("•" + itemLabel(item) + " : " + (day.produk[item.id]||0));
+    });
+    lines.push("TOTAL AWAL = " + formatRupiah(t.totalAwal));
+    lines.push("PENGELUARAN");
+    lines.push("QRIS : " + formatRupiah(day.pengeluaran.qris||0));
+    lines.push("UM : " + formatRupiah(day.pengeluaran.um||0));
+    lines.push("Free Haircut : " + formatRupiah(day.pengeluaran.freeHaircut||0));
+    day.pengeluaran.custom.forEach(function(c){
+      lines.push(c.name + " : " + formatRupiah(c.value||0));
+    });
+    lines.push("TOTAL AKHIR = " + formatRupiah(t.totalAkhir));
+    lines.push("CLOSED");
+    return lines.join("\n");
+  }
+
+  var reportOverlay = document.getElementById("reportOverlay");
+  var receiptText = document.getElementById("receiptText");
+  document.querySelector('[data-action="generate"]').addEventListener("click", function(){
+    persistDay();
+    receiptText.textContent = generateReportText();
+    reportOverlay.classList.add("show");
+  });
+  document.querySelector('[data-action="close-report"]').addEventListener("click", function(){
+    reportOverlay.classList.remove("show");
+  });
+  document.querySelector('[data-action="copy-report"]').addEventListener("click", function(){
+    var text = generateReportText();
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ toast("Teks laporan disalin"); })
+      .catch(function(){ fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  });
+  function fallbackCopy(text){
+    var ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); toast("Teks laporan disalin"); }
+    catch(e){ toast("Gagal menyalin, salin manual ya"); }
+    document.body.removeChild(ta);
+  }
+
+  /* ---------- init ---------- */
+  renderAll();
+
+})();
+</script>
+</body>
+</html>
