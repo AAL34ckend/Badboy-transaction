@@ -301,7 +301,7 @@
         /* PENGELUARAN */
         
         .expense-fixed .field-row {
-            align-items: flex-end;
+            align-items: center;
         }
         
         .custom-expense-row {
@@ -537,7 +537,6 @@
                 padding: 14px 10px 34px;
             }
             .field-row {
-                flex-direction: column;
                 gap: 10px;
             }
             .select-with-actions {
@@ -561,38 +560,51 @@
         
         @media (max-width: 450px) {
             .icon-btn {
-                width: 30px;
-                height: 30px;
+                width: 1.2rem;
+                height: 1.2rem;
                 font-size: 13px;
             }
             .item-row {
+                display: grid;
                 flex-wrap: wrap;
                 row-gap: 8px;
             }
+            .item-price,
             .item-info {
-                flex: 1 1 100%;
-                order: 1;
-            }
-            .stepper {
-                order: 2;
-            }
-            .item-actions {
-                order: 3;
-                margin-left: auto;
-            }
-            .step-btn {
-                width: 28px;
-                height: 28px;
+                text-align: center;
                 font-size: 15px;
             }
-            .qty-input {
-                width: 36px;
+            .field-row {
+                flex-direction: column;
             }
-            .item-actions .icon-btn {
-                width: 26px;
-                height: 26px;
-                font-size: 11px;
-            }
+        }
+        
+        .stepper {
+            order: 2;
+        }
+        
+        .item-actions {
+            order: 3;
+            align-items: center;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .step-btn {
+            width: 3rem;
+            height: 3rem;
+            font-size: 15px;
+        }
+        
+        .qty-input {
+            width: 36px;
+            height: 3rem;
+        }
+        
+        .item-actions .icon-btn {
+            width: 26px;
+            height: 26px;
+            font-size: 11px;
         }
     </style>
 </head>
