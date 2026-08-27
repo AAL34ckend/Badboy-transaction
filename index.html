@@ -220,8 +220,6 @@
         }
         
         .item-info {
-            display: flex;
-            flex-direction: column;
             flex: 1;
             min-width: 0;
         }
@@ -535,29 +533,65 @@
         }
         
         @media (max-width: 520px) {
-            .step-btn {
-                width: 100%;
+            .wrap {
+                padding: 14px 10px 34px;
             }
-            .item-row {
+            .field-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .select-with-actions {
+                gap: 6px;
+            }
+            .select-with-actions select {
+                min-width: 0;
+            }
+            .icon-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 14px;
+            }
+            .totals {
                 flex-direction: column;
             }
-            .item-info {
-                flex: 1;
-                flex-direction: row;
-                gap: .5rem;
-                align-items: center;
-            }
-            .item-name {
-                font-size: 15px;
-            }
-            .item-price {
-                font-size: 18px;
+            .card {
+                padding: 13px;
             }
         }
         
-        @media (max-width: 380px) {
-            .totals {
-                flex-direction: column;
+        @media (max-width: 450px) {
+            .icon-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 13px;
+            }
+            .item-row {
+                flex-wrap: wrap;
+                row-gap: 8px;
+            }
+            .item-info {
+                flex: 1 1 100%;
+                order: 1;
+            }
+            .stepper {
+                order: 2;
+            }
+            .item-actions {
+                order: 3;
+                margin-left: auto;
+            }
+            .step-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 15px;
+            }
+            .qty-input {
+                width: 36px;
+            }
+            .item-actions .icon-btn {
+                width: 26px;
+                height: 26px;
+                font-size: 11px;
             }
         }
     </style>
@@ -668,7 +702,7 @@
         </div>
 
         <div class="action-row">
-            <button class="btn btn-secondary" data-action="reset-day">Reset Hari Ini</button>
+            <button class="btn btn-secondary" data-action="save-day">Simpan</button>
             <button class="btn btn-primary" data-action="generate">Generate Laporan</button>
         </div>
         <p class="muted-note" id="autosaveNote">Data tersimpan otomatis di browser ini.</p>
@@ -1396,14 +1430,27 @@
                 afterChange();
             }
 
-            /* ---------- reset / generate ---------- */
-            document.querySelector('[data-action="reset-day"]').addEventListener("click", function() {
-                if (!confirm("Reset semua input untuk tanggal ini?")) return;
-                day = blankDay(currentISO);
-                renderAll();
+            /* ---------- simpan / generate ---------- */
+            document.querySelector('[data-action="save-day"]').addEventListener("click", function() {
                 persistDay();
-                toast("Laporan hari ini direset");
+                toast("Data tersimpan ke browser");
             });
+
+            function boldVal(n, formatter) {
+                n = Number(n) || 0;
+                if (n === 0) return "**";
+                return "**" + formatter(n) + "**";
+            }
+
+            function boldInt(n) {
+                return boldVal(n, function(v) {
+                    return String(v);
+                });
+            }
+
+            function boldRp(n) {
+                return boldVal(n, formatRupiah);
+            }
 
             function generateReportText() {
                 var t = computeTotals();
@@ -1412,26 +1459,33 @@
                 });
                 var lines = [];
                 lines.push("LAPORAN HARIAN");
+                lines.push("");
                 lines.push("Tanggal " + isoToDisplay(day.tanggal));
                 lines.push("Kapster : " + day.kapster);
+                lines.push("");
                 lines.push("PENDAPATAN");
                 lines.push(tempat ? tempat.name : "-");
                 master.pendapatanItems.forEach(function(item) {
-                    lines.push("•" + itemLabel(item) + " : " + (day.pendapatan[item.id] || 0));
+                    lines.push("•" + itemLabel(item) + " : " + boldInt(day.pendapatan[item.id] || 0));
                 });
+                lines.push("");
                 lines.push("PRODUK");
                 master.produkItems.forEach(function(item) {
-                    lines.push("•" + itemLabel(item) + " : " + (day.produk[item.id] || 0));
+                    lines.push("•" + itemLabel(item) + " : " + boldInt(day.produk[item.id] || 0));
                 });
-                lines.push("TOTAL AWAL = " + formatRupiah(t.totalAwal));
+                lines.push("");
+                lines.push("TOTAL AWAL = " + boldRp(t.totalAwal));
+                lines.push("");
                 lines.push("PENGELUARAN");
-                lines.push("QRIS : " + formatRupiah(day.pengeluaran.qris || 0));
-                lines.push("UM : " + formatRupiah(day.pengeluaran.um || 0));
-                lines.push("Free Haircut : " + formatRupiah(day.pengeluaran.freeHaircut || 0));
+                lines.push("QRIS : " + boldRp(day.pengeluaran.qris || 0));
+                lines.push("UM : " + boldRp(day.pengeluaran.um || 0));
+                lines.push("Free Haircut : " + boldRp(day.pengeluaran.freeHaircut || 0));
                 day.pengeluaran.custom.forEach(function(c) {
-                    lines.push(c.name + " : " + formatRupiah(c.value || 0));
+                    lines.push(c.name + " : " + boldRp(c.value || 0));
                 });
-                lines.push("TOTAL AKHIR = " + formatRupiah(t.totalAkhir));
+                lines.push("");
+                lines.push("TOTAL AKHIR = " + boldRp(t.totalAkhir));
+                lines.push("");
                 lines.push("CLOSED");
                 return lines.join("\n");
             }
