@@ -926,6 +926,7 @@
             }
 
             var master = loadMaster();
+            saveMaster();
             var history = loadHistory();
             var currentISO = todayISO();
             var day = history[currentISO] ? ensureDayShape(history[currentISO]) : blankDay(currentISO);
