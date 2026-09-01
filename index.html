@@ -1705,7 +1705,14 @@
                 lines.push("LAPORAN HARIAN");
                 lines.push("");
                 lines.push("Tanggal " + isoToDisplay(day.tanggal));
-                lines.push("Kapster : " + (day.kapsters.length ? day.kapsters.join(", ") : "-"));
+                lines.push("Kapster :");
+                if (day.kapsters.length) {
+                    day.kapsters.forEach(function(name, idx) {
+                        lines.push((idx + 1) + ". " + name);
+                    });
+                } else {
+                    lines.push("-");
+                }
                 lines.push("");
                 lines.push("PENDAPATAN");
                 lines.push(tempat ? tempat.name : "-");
